@@ -7,18 +7,16 @@
 	let images = $state([]);
 
 	onMount(async () => {
-		const encyclopediaCookie = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('encyclopedia='));
+		const encyclopedia = localStorage.getItem('encyclopedia');
 
 		const topicCookie = document.cookie.split('; ').find((row) => row.startsWith('topic='));
 
-		if (!encyclopediaCookie || !topicCookie) return;
+		if (!encyclopedia || !topicCookie) return;
 
 		try {
-			let data = JSON.parse(decodeURIComponent(encyclopediaCookie.split('=').slice(1).join('=')));
+			let encyclopediaData = JSON.parse(encyclopedia);
 
-			response = data.response ?? {};
+			response = encyclopediaData.response ?? encyclopediaData;
 
 			const topic = decodeURIComponent(topicCookie.split('=').slice(1).join('='));
 
@@ -30,7 +28,7 @@
 				throw new Error(`Openverse returned ${res.status}`);
 			}
 
-			data = await res.json();
+			const data = await res.json();
 
 			images = data.results ?? [];
 
