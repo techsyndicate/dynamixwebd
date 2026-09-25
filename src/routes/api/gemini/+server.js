@@ -433,6 +433,7 @@ export async function POST({ request }) {
 		);
 
 		const data = await response.json();
+		document.cookie = `encyclopedia=${encodeURIComponent(JSON.stringify({ response: data }))}; path=/; max-age=86400`;
 
 		if (!response.ok) {
 			console.error('Groq error:', data);
