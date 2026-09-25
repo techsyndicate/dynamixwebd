@@ -386,8 +386,7 @@ short fact + short fact + short fact.
 Be detailed, but never invent information to achieve length.
 `;
 
-
-export async function POST({ request, cookies }) {
+export async function POST({ request }) {
 	try {
 		const { prompt } = await request.json();
 
@@ -423,7 +422,7 @@ export async function POST({ request, cookies }) {
 							content: prompt
 						}
 					],
-					max_completion_tokens: 10000,
+					max_completion_tokens: 8000,
 					temperature: 0.3,
 					response_format: {
 						type: 'json_object'
@@ -451,7 +450,20 @@ export async function POST({ request, cookies }) {
 		}
 
 		const output = data.choices?.[0]?.message?.content;
-		cookies.set('encyclopedia',JSON.stringify({ response: output }),{path: '/',maxAge: 86400,httpOnly: false});
+
+		if (!output) {
+			return new Response(
+				JSON.stringify({
+					error: 'Groq returned no content'
+				}),
+				{
+					status: 500,
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				}
+			);
+		}
 
 		return new Response(output, {
 			headers: {
