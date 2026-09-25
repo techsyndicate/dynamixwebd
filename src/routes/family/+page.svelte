@@ -7,17 +7,16 @@
 	let images = $state([]);
 
 	onMount(() => {
-		const cookie = document.cookie.split('; ').find((row) => row.startsWith('encyclopedia='));
+		const encyclopedia = localStorage.getItem('encyclopedia');
 
-		if (cookie) {
+		if (encyclopedia) {
 			try {
-				const data = JSON.parse(decodeURIComponent(cookie.split('=').slice(1).join('=')));
+				const data = JSON.parse(encyclopedia);
 
-				response = data.response ?? {};
-
+				response = data.response ?? data;
 				images = data.images ?? [];
 			} catch (err) {
-				console.error('Could not load encyclopedia cookie:', err);
+				console.error('Could not load encyclopedia from localStorage:', err);
 			}
 		}
 	});
