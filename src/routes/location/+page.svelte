@@ -7,20 +7,16 @@
 	let images = $state([]);
 
 	onMount(async () => {
-		const encyclopediaCookie = document.cookie
-			.split('; ')
-			.find((row) => row.startsWith('encyclopedia='));
+		const encyclopedia = localStorage.getItem('encyclopedia');
 
 		const topicCookie = document.cookie.split('; ').find((row) => row.startsWith('topic='));
 
-		if (!encyclopediaCookie || !topicCookie) return;
+		if (!encyclopedia || !topicCookie) return;
 
 		try {
-			const encyclopediaData = JSON.parse(
-				decodeURIComponent(encyclopediaCookie.split('=').slice(1).join('='))
-			);
+			const encyclopediaData = JSON.parse(encyclopedia);
 
-			response = encyclopediaData.response ?? {};
+			response = encyclopediaData.response ?? encyclopediaData;
 
 			const topic = decodeURIComponent(topicCookie.split('=').slice(1).join('=')).trim();
 
