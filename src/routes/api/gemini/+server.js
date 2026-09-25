@@ -387,7 +387,7 @@ Be detailed, but never invent information to achieve length.
 `;
 
 
-export async function POST({ request }) {
+export async function POST({ request, cookies }) {
 	try {
 		const { prompt } = await request.json();
 
@@ -433,7 +433,6 @@ export async function POST({ request }) {
 		);
 
 		const data = await response.json();
-		document.cookie = `encyclopedia=${encodeURIComponent(JSON.stringify({ response: data }))}; path=/; max-age=86400`;
 
 		if (!response.ok) {
 			console.error('Groq error:', data);
@@ -452,6 +451,7 @@ export async function POST({ request }) {
 		}
 
 		const output = data.choices?.[0]?.message?.content;
+		cookies.set('encyclopedia',JSON.stringify({ response: output }),{path: '/',maxAge: 86400,httpOnly: false});
 
 		return new Response(output, {
 			headers: {
