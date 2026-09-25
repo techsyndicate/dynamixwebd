@@ -423,7 +423,7 @@ export async function POST({ request }) {
 							content: prompt
 						}
 					],
-					max_completion_tokens: 7500,
+					max_completion_tokens: 10000,
 					temperature: 0.3,
 					response_format: {
 						type: 'json_object'
