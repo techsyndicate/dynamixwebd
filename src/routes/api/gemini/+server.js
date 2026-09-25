@@ -29,7 +29,7 @@ Generate a LARGE and DETAILED article.
 
 Each major prose section should normally contain several substantial paragraphs.
 
-For major historical or biographical topics, aim for approximately 800–1500 words when the available information supports it.
+For major historical or biographical topics, aim for approximately 800–1200 words when the available information supports it.
 
 For smaller or simpler topics, use as much detail as is reasonably supported by the subject.
 
@@ -423,6 +423,7 @@ export async function POST({ request }) {
 							content: prompt
 						}
 					],
+					max_completion_tokens: 7500,
 					temperature: 0.3,
 					response_format: {
 						type: 'json_object'
