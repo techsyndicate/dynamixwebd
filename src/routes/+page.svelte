@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import { page } from '$app/state';
+
 	let inputValue = $state('');
 	let response = $state({});
 	let images = $state([]);
@@ -9,18 +10,22 @@
 	let loading = $state(false);
 	let error = $state('');
 	let sidebarOpen = $state(true);
+
 	onMount(() => {
-		const cookie = document.cookie.split('; ').find((row) => row.startsWith('encyclopedia='));
-		if (cookie) {
+		const encyclopedia = localStorage.getItem('encyclopedia');
+
+		if (encyclopedia) {
 			try {
-				const data = JSON.parse(decodeURIComponent(cookie.split('=').slice(1).join('=')));
-				response = data.response ?? {};
+				const data = JSON.parse(encyclopedia);
+
+				response = data.response ?? data;
 				images = data.images ?? [];
 			} catch (err) {
-				console.error('Could not load encyclopedia cookie:', err);
+				console.error('Could not load encyclopedia from localStorage:', err);
 			}
 		}
 	});
+
 	let links = $derived(
 		response['Family Tree'] && response['Family Tree'].length > 0
 			? [
@@ -39,10 +44,12 @@
 					{ label: 'Society at the time', href: '/society' }
 				]
 	);
+
 	async function logout() {
 		await signOut(auth);
 		goto('/');
 	}
+
 	async function submit() {
 		clicked = true;
 		loading = true;
@@ -92,10 +99,10 @@
 				images
 			};
 
-			document.cookie =
-				`encyclopedia=${encodeURIComponent(JSON.stringify(Data))}; ` + `path=/; max-age=86400`;
+			localStorage.setItem('encyclopedia', JSON.stringify(Data));
 
 			// Get the actual topic from the user's question
+
 			const topic = inputValue
 				.replace(/^What is\s+/i, '')
 				.replace(/\?$/, '')
@@ -127,6 +134,7 @@
 			loading = false;
 		}
 	}
+
 	const topics = {
 		Religion: [
 			'Christianity',
@@ -138,6 +146,7 @@
 			'Taoism',
 			'Shinto'
 		],
+
 		Mythology: [
 			'Dragon',
 			'Phoenix',
@@ -148,6 +157,7 @@
 			'Cerberus',
 			'Sphinx'
 		],
+
 		Culture: [
 			'Japanese Culture',
 			'Greek Culture',
@@ -166,6 +176,7 @@
 	style="background-image: url('/bg.png');"
 >
 	<div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+
 	<div
 		class={`relative z-10 shrink-0 overflow-hidden border-r border-white/20 bg-white/40 shadow-lg backdrop-blur-md transition-all duration-300 ${
 			sidebarOpen ? 'w-[220px]' : 'w-0'
@@ -178,6 +189,7 @@
 			{links}
 		/>
 	</div>
+
 	<main class="relative z-10 flex-1 overflow-y-auto">
 		<div class="box-border flex min-h-full w-full flex-col items-center">
 			<div class="w-full max-w-[900px] px-5 py-10">
@@ -191,8 +203,10 @@
 							Encyclopedia - {inputValue}
 						</h1>
 					{/if}
+
 					<p class="m-0 text-base text-zinc-200 drop-shadow">Search the knowledge base</p>
 				</header>
+
 				<div class="mx-auto flex w-full max-w-[600px] flex-col items-center">
 					<input
 						bind:value={inputValue}
@@ -200,6 +214,7 @@
 						onkeydown={(e) => e.key === 'Enter' && submit()}
 						class="box-border w-full rounded-xl border border-white/40 bg-white/80 px-[18px] py-[14px] text-base text-black shadow-lg backdrop-blur-md outline-none focus:ring-2 focus:ring-white"
 					/>
+
 					<button
 						onclick={submit}
 						disabled={loading}
@@ -208,11 +223,13 @@
 						{loading ? 'Thinking...' : 'Submit'}
 					</button>
 				</div>
+
 				{#if error}
 					<p class="mt-4 text-center font-semibold text-red-200 underline">
 						{error}
 					</p>
 				{/if}
+
 				{#if Object.keys(response).length > 0}
 					<div class="w-full">
 						{#each Object.entries(response) as [category, content]}
@@ -223,6 +240,7 @@
 									<h2 class="mt-0 mb-3 text-xl font-bold text-black">
 										{category}
 									</h2>
+
 									{#if Array.isArray(content)}
 										<ul class="list-disc space-y-1 pl-5 leading-relaxed">
 											{#each content as item}
@@ -237,6 +255,7 @@
 												<h3 class="mt-2 mb-1 font-semibold text-black underline">
 													{subCategory}
 												</h3>
+
 												{#if Array.isArray(items)}
 													<ul class="list-disc space-y-1 pl-5 leading-relaxed">
 														{#each items as item}
@@ -262,10 +281,12 @@
 						{/each}
 					</div>
 				{/if}
+
 				<div class="mt-16 w-full border-t border-white/20 pt-10">
 					<div class="grid grid-cols-1 gap-8 md:grid-cols-3">
 						<div>
 							<h3 class="mb-4 text-lg font-bold text-white drop-shadow">Religion</h3>
+
 							<div class="flex flex-col gap-2">
 								{#each topics.Religion as item}
 									<button
@@ -280,8 +301,10 @@
 								{/each}
 							</div>
 						</div>
+
 						<div>
 							<h3 class="mb-4 text-lg font-bold text-white drop-shadow">Mythology</h3>
+
 							<div class="flex flex-col gap-2">
 								{#each topics.Mythology as item}
 									<button
@@ -296,8 +319,10 @@
 								{/each}
 							</div>
 						</div>
+
 						<div>
 							<h3 class="mb-4 text-lg font-bold text-white drop-shadow">Culture</h3>
+
 							<div class="flex flex-col gap-2">
 								{#each topics.Culture as item}
 									<button
